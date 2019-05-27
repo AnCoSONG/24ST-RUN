@@ -1,0 +1,228 @@
+[
+  {
+    "__type__": "cc.Prefab",
+    "_name": "",
+    "_objFlags": 0,
+    "_native": "",
+    "data": {
+      "__id__": 1
+    },
+    "optimizationPolicy": 0,
+    "asyncLoadAssets": false
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "stone",
+    "_objFlags": 0,
+    "_parent": null,
+    "_children": [],
+    "_active": true,
+    "_level": 2,
+    "_components": [
+      {
+        "__id__": 2
+      },
+      {
+        "__id__": 3
+      },
+      {
+        "__id__": 4
+      },
+      {
+        "__id__": 5
+      }
+    ],
+    "_prefab": {
+      "__id__": 6
+    },
+    "_opacity": 255,
+    "_color": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 197,
+      "height": 113
+    },
+    "_anchorPoint": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0.5
+    },
+    "_position": {
+      "__type__": "cc.Vec3",
+      "x": 226,
+      "y": -752,
+      "z": 0
+    },
+    "_scale": {
+      "__type__": "cc.Vec3",
+      "x": 0.5,
+      "y": 0.5,
+      "z": 1
+    },
+    "_rotationX": 0,
+    "_rotationY": 0,
+    "_quat": {
+      "__type__": "cc.Quat",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 1
+    },
+    "_skewX": 0,
+    "_skewY": 0,
+    "groupIndex": 2,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.Sprite",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "_spriteFrame": {
+      "__uuid__": "a80ff01e-230f-478c-a896-167064012954"
+    },
+    "_type": 0,
+    "_sizeMode": 1,
+    "_fillType": 0,
+    "_fillCenter": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "_fillStart": 0,
+    "_fillRange": 0,
+    "_isTrimmedMode": true,
+    "_state": 0,
+    "_atlas": null,
+    "_srcBlendFactor": 770,
+    "_dstBlendFactor": 771,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.PolygonCollider",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "tag": 3,
+    "_offset": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "points": [
+      {
+        "__type__": "cc.Vec2",
+        "x": 96,
+        "y": 56.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 58,
+        "y": 45.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 4,
+        "y": 10.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 0,
+        "y": -8.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 24,
+        "y": -46.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 80,
+        "y": -56.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 162,
+        "y": -52.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 197,
+        "y": 2.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 195,
+        "y": 14.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 165,
+        "y": 35.5
+      },
+      {
+        "__type__": "cc.Vec2",
+        "x": 112,
+        "y": 55.5
+      }
+    ],
+    "_id": ""
+  },
+  {
+    "__type__": "89d0fPZsJ9BcpUcuWO9oNQD",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "damage": 15,
+    "speed": 1000,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.Animation",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "_defaultClip": {
+      "__uuid__": "6d22d8d1-92da-4dd0-9105-8d9ceb19faa1"
+    },
+    "_clips": [
+      {
+        "__uuid__": "6d22d8d1-92da-4dd0-9105-8d9ceb19faa1"
+      },
+      {
+        "__uuid__": "561891f1-0886-49a2-bbc7-cb0d64518e56"
+      }
+    ],
+    "playOnLoad": false,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.PrefabInfo",
+    "root": {
+      "__id__": 1
+    },
+    "asset": {
+      "__uuid__": "7819122a-1936-45dd-884f-8c78d79f1c7c"
+    },
+    "fileId": "49GrQDFN5ELrqR801Y7opC",
+    "sync": false
+  }
+]
