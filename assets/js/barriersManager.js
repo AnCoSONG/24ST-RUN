@@ -68,7 +68,7 @@ cc.Class({
     generateArrowBarrier() {
         this.generationStatus = GENERATING;
         let randNum = Math.floor(Math.random() * 2) //1是关卡数
-        randNum = 1;
+        // randNum = 1;
         cc.log('当前Arrow关卡', randNum);
         switch (randNum) {
             case 0:
@@ -107,11 +107,11 @@ cc.Class({
             case 1:
                 this.arrowList = [];
                 //  生成一定数量的arrow
-                for (let i = 0; i < 12; i++) {
+                for (let i = 0; i < 9; i++) {
                     let arrowOne = cc.instantiate(this.arrow)
                     arrowOne.getComponent('arrow').init(this.gameManager);
-                    arrowOne.getComponent('arrow').setY(300 - 150 * Math.floor(i / 3)); //setY
-                    arrowOne.getComponent('arrow').addXOffset(300 * Math.floor(i % 3)); //setXOffset
+                    arrowOne.getComponent('arrow').setY(300 - 200 * Math.floor(i / 3)); //setY
+                    arrowOne.getComponent('arrow').addXOffset(1000 * Math.floor(i % 3)); //setXOffset
 
                     this.node.addChild(arrowOne);
                     this.arrowList.push(arrowOne);
@@ -130,7 +130,7 @@ cc.Class({
                 this.scheduleOnce(() => {
                     this.generationStatus = DONE;
                     this.node.removeAllChildren();
-                }, 12);
+                }, 10);
                 break;
             default:
                 break;
@@ -150,7 +150,7 @@ cc.Class({
                     let stoneOne = cc.instantiate(this.stone)
                     cc.log('stone init');
                     stoneOne.getComponent('stone').init(this.gameManager);
-                    stoneOne.getComponent('stone').setY(-200);
+                    stoneOne.getComponent('stone').setY(global.HEIGHT_HIT_PLAYER);
                     stoneOne.getComponent('stone').setXOffset(i * 1000);
                     cc.log('stone', stoneOne.x, stoneOne.y);
                     this.node.addChild(stoneOne);
@@ -160,7 +160,7 @@ cc.Class({
                 //发射
 
                 this.stoneList.forEach(element => {
-                    // element.getComponent(cc.Animation).play(); //播放动画
+                    element.getComponent(cc.Animation).play(); //播放动画
                     cc.log('shoot', element.x, element.y);
                     element.getComponent('stone').shoot()
                 });
@@ -189,7 +189,7 @@ cc.Class({
                 cc.log('wait for barrier');
                 //随机数看生成什么关卡
                 let rand = Math.floor(Math.random() * 2)
-                rand = 0;
+                // rand = 0;
                 switch (rand) {
                     case 0:
                         cc.log('arrow 关')

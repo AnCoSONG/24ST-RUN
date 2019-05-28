@@ -1,11 +1,11 @@
 {
   "__type__": "cc.AnimationClip",
-  "_name": "stone",
+  "_name": "rotate",
   "_objFlags": 0,
   "_native": "",
   "_duration": 1,
   "sample": 60,
-  "speed": 2,
+  "speed": 3,
   "wrapMode": "2",
   "curveData": {
     "props": {

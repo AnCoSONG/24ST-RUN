@@ -1,3 +1,5 @@
+import global from "./DATA";
+
 // Learn cc.Class:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/class.html
 //  - [English] http://docs.cocos2d-x.org/creator/manual/en/scripting/class.html
@@ -41,6 +43,8 @@ cc.Class({
 
     onLoad() {
         //游戏核心逻辑维护
+        // this.hSpeed = 0; //水平移动速度
+        // this.hAccel = 0; //水平加速度
         this.vSpeed = 0; //纵向速度
         this.vMove = false; //是否纵向可动 jumpNew 实现依赖
         this.vAccel = 0; //是否纵向可动 jumpNew 实现依赖
@@ -90,9 +94,43 @@ cc.Class({
 
     //使用坐标控制实现更准确地开跑
     runNew() {
-        //给一个向上和向左的初速度，并开启vMove和hMove以开启移动
+        //蓄力
+
+        let superJump = cc.callFunc(_ => {
+            //蓄力
+            //起跳
+            this.setDragonBonesAnimation('jump');
+            this.vSpeed = 2000;
+            this.vAccel = 2000;
+            this.vMove = true;
+        })
+        this.node.runAction(superJump);
+
+
+
     },
 
+    glide() {
+        //下滑动作包括几个部分
+        //1. 人物下滑动作
+        //2. 下滑时人物的碰撞包围盒变动
+        //3. 人物向前移动一小截
+        //4. 人物匀速移动回原位
+        //5. 人物包围盒恢复
+    },
+
+    //暂时不可行
+    // moveForward(x, duration) {
+    //     //向前移动，通过x=1/2at^2来控制a的值从而实现
+
+    // },
+    // //暂时不可行
+
+    // moveBackward(x, duration) {
+
+    // },
+
+    //弃用
     jump() {
 
         //可能得重写，得手动用加速度和坐标去实现跳跃
@@ -173,13 +211,24 @@ cc.Class({
     playerDead() {
         //提示GameOver
         cc.log('game over')
+
+        //播放人物死亡动画
+
+
+        //切换到gameover界面
+        cc.director.loadScene('gameover');
     },
 
 
 
 
 
+
     update(dt) {
+
+
+
+
         //通过速度判断当前动画
 
 
@@ -187,8 +236,15 @@ cc.Class({
 
         cc.log('人物高度', this.node.y)
         // cc.log(this.node.getBoundingBox())
+
+        //水平移动
+
+
+        //水平移动结束
+
         //跳跃逻辑
         // 判断是否进入跳跃状态
+        cc.log(this.vMove, this.vSpeed, this.vAccel);
         if (this.vMove) {
             this.node.y += this.vSpeed * dt; //改变y坐标
             this.vSpeed -= this.vAccel * dt; //改变纵向速度
@@ -197,10 +253,21 @@ cc.Class({
 
         }
         if (this.gameManager.gameStart) {
-            if (this.node.getBoundingBox().yMin < this.gameManager.road.getBoundingBox().yMax) {
-                //检测地面碰撞情况
-                cc.log('落地')
-                this.node.y = this.gameManager.road.getBoundingBox().yMax;
+            // cc.log(this.gameManager.road_manager.getCurrentRoad());
+
+            if (this.gameManager.road_manager.getCurrentRoad().name == "road1") {
+
+                if (this.node.getBoundingBox().yMin < this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 10) {
+                    //检测地面碰撞情况
+                    cc.log('落地')
+                    this.node.y = this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 10;
+                }
+            } else if (this.gameManager.road_manager.getCurrentRoad().name == 'road2') {
+                if (this.node.getBoundingBox().yMin < this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 5) {
+                    //检测地面碰撞情况
+                    cc.log('落地')
+                    this.node.y = this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 5;
+                }
             }
         }
         //Limit Pos
@@ -229,12 +296,21 @@ cc.Class({
         cc.log('on collision enter')
         if (self.tag == 0 && other.tag == 1) {
             cc.log('on the road');
+            if (!global.PLAYER_SHOWUP) {
+                global.PLAYER_SHOWUP = true;
+                this.gameManager.road_manager.setMoveSpeed(global.NORMAL_ROAD_SPEED);
+                this.gameManager.setBgSpeed(global.NORMAL_BG_SPEED);
+
+                cc.log(this.gameManager.bgSpeed);
+                cc.log(this.gameManager.road_manager.moveSpeed);
+            }
             //碰撞检测的方式在速度过快的情况下会反应不及时
             this.vMove = true;
             this.vSpeed = 0; //将纵向速度变为0 停止总想运动
             this.vAccel = 0;
             this.setDragonBonesAnimation('run')
             this.jumpTime = 2;
+
 
         } else if (other.tag == 2) {
             //arrow

@@ -10,6 +10,9 @@
 
 import player from 'player';
 import barriersManager from 'barriersManager'
+import road_manager from 'road'
+import global from './DATA';
+
 
 cc.Class({
     extends: cc.Component,
@@ -31,6 +34,7 @@ cc.Class({
         //     }
         // },
         moveSpeed: 0,
+        bgSpeed: 0,
         background: {
             type: cc.Node,
             default: null
@@ -61,9 +65,12 @@ cc.Class({
 
         bgList: [cc.Node],
 
-        road: cc.Node,
+        // road: cc.Node,
 
-        barriersManager: barriersManager
+
+        barriersManager: barriersManager,
+
+        road_manager: road_manager
 
     },
 
@@ -83,8 +90,7 @@ cc.Class({
         // this.gamingMap = cc.instantiate(this.mapPrefab)
         this.viewportWidth = cc.winSize.width
         this.viewportHeight = cc.winSize.height;
-        let bg1 = this.bgList[0];
-        let bg2 = this.bgList[1];
+
 
         //end
 
@@ -103,16 +109,25 @@ cc.Class({
         cc.log(frameSize);
         cc.log(canvasSize);
         cc.log(designSize);
+
+
+        // this.beginToShowLogo()
+        // this.LoadMap()
+        // this.afterLoadMap();
+
         // 切入场景
-        let bgAction = cc.spawn(cc.scaleTo(2, 0.6), cc.moveBy(2, cc.v2(-1200, 0))).easing(cc.easeCubicActionInOut());
-        // let buttonAction = cc.moveBy(2, cc.v2(-400, 0)).easing(cc.easeCubicActionInOut());
-        this.background.runAction(bgAction);
-        this.fixBgPos(bg1, bg2, this.background) //初始化游戏地图的位置
+        // let bgAction = cc.spawn(cc.scaleTo(2, 0.6), cc.moveBy(2, cc.v2(-1200, 0))).easing(cc.easeCubicActionInOut());
+        // // let buttonAction = cc.moveBy(2, cc.v2(-400, 0)).easing(cc.easeCubicActionInOut());
+        // this.background.runAction(bgAction);
+
+
+
+
         // for (let i of bgList) {
         //     i.runAction(bgAction.clone());
         // }
         // this.gamingMap.runAction(bgAction.clone());
-        this.showHomePage();
+        // this.showHomePage();
         // cc.log(this.gamingMap)
         //调用init函数
         this.init();
@@ -122,9 +137,46 @@ cc.Class({
         //事件注册
         this.node.on('touchstart', this.onTouchStart, this);
         this.node.on('touchend', this.onTouchEnd, this);
+        this.node.on('movetomiddle', function () {
+            this.background.pauseAllActions();
+            let fixLogo = cc.callFunc(_ => {
+                cc.log('设置logo位置')
+                this.node.getChildByName('logo').setPosition(0, 0);
+            })
+
+            let showLogo = cc.fadeIn(1)
+
+            let scaleLogo = cc.scaleTo(1, 1.1).easing(cc.easeCubicActionInOut())
+            let hideLogo = cc.spawn(cc.moveBy(0.5, cc.v2(0, 100)), cc.fadeOut(0.5));
+            let logoFinish = cc.callFunc(_ => {
+                this.node.emit('logofinish')
+            })
+            this.node.getChildByName('logo').runAction(cc.sequence(fixLogo, showLogo, scaleLogo, hideLogo, logoFinish));
+        }, this)
+
+        this.node.on('logofinish', function () {
+            cc.log('on')
+            // cc.log(this.background.getNumberOfRunningActions());
+            this.background.resumeAllActions();
+        }, this)
 
 
 
+
+
+    },
+
+    start() {
+        cc.log(this.viewportWidth, this.viewportHeight);
+        // 切入首页前的动作
+        if (!global.RESTART) {
+            this.begin()
+        } else {
+            this.restart();
+        }
+        let bg1 = this.bgList[0];
+        let bg2 = this.bgList[1];
+        this.fixBgPos(bg1, bg2, this.background) //初始化游戏地图的位置
     },
 
     onTouchStart(event) {
@@ -162,7 +214,8 @@ cc.Class({
         //游戏人物init
         this.character.init(this);
         //路面init
-        this.road.getComponent('road').init(this);
+        // this.road.getComponent('road').init(this);
+        this.road_manager.init(this);
 
         //地图元素init
 
@@ -171,19 +224,71 @@ cc.Class({
         //状态系统init
     },
 
-    start() {
-        cc.log(this.viewportWidth, this.viewportHeight);
+    restart() {
+        cc.log('restart')
+        let moveBackToGame = cc.spawn(cc.scaleTo(2, 0.6), cc.moveBy(2, cc.v2(-2800, 0))).easing(cc.easeCubicActionInOut());
+        //   let playerAppear = cc.callFunc(_=>{
+        //       this.setDragonBonesAnimation('jump');
+        //       this.vSpeed = 2000;
+        //       this.vAccel = 2000;
+        //       this.vMove = true;
+        //   })
+        let startgame = cc.callFunc(_ => {
+            cc.log('restart game')
+            this.gameStart = true;
+
+            //人物跳到很高的地方
+            this.character.runNew();
+            //这个时候使地图移动速度变快
+            this.setBgSpeed(global.SHOWUP_SPEED);
+            this.setRoadSpeed(global.SHOWUP_SPEED);
+        }, this)
+
+        this.background.runAction(cc.sequence(moveBackToGame, startgame));
+
+    },
+
+
+
+
+    begin() {
+
+        //切到一定的位置
+
+        //显示logo
+
+        //放大logo
+        let moveToMiddle = cc.spawn(cc.scaleTo(2, 0.6), cc.moveBy(2, cc.v2(-800, 0))).easing(cc.easeCubicActionInOut());
+        let moveToMiddleDone = cc.callFunc(_ => {
+            this.node.emit('movetomiddle');
+        })
+
+        let moveToHome = cc.moveBy(1, cc.v2(-2000, 0)).easing(cc.easeCubicActionInOut())
+
+        let showhomepage = cc.callFunc(this.showHomePage, this)
+
+
+        let process = cc.sequence(moveToMiddle, moveToMiddleDone, moveToHome, showhomepage);
+        this.background.runAction(process)
 
 
     },
 
+    //准备采用分包加载的方式
+    LoadMap() {
+        //用cc.loader动态的从服务器下载图片
+        //或者接入云开发，使用wx的接口从服务器拿图片也可以
+
+        //拿到之后,回调函数中设置当前游戏开始
+        cc.log('loading map')
+    },
+
     update(dt) {
         if (this.gameStart) {
-
-            this.background.x -= dt * this.moveSpeed; //移动
+            this.homeBgMove(this.bgSpeed * dt);
             // this.gamingMap.x -= dt * this.moveSpeed;
 
-            this.gamebgMove(dt * this.moveSpeed, this.bgList);
+            this.gamebgMove(dt * this.bgSpeed, this.bgList);
             this.checkBgReset(this.bgList)
         }
         // cc.log(this.bgList)
@@ -216,7 +321,7 @@ cc.Class({
             // this.character.node.runAction(charAction);
             this.character.appear();
 
-        }, 1.5)
+        }, 1)
     },
 
     hideButton() {
@@ -229,6 +334,14 @@ cc.Class({
             // this.character.node.runAction(charAction);
 
         }, 0)
+    },
+
+    setBgSpeed(speed) {
+        this.bgSpeed = speed;
+    },
+
+    setRoadSpeed(speed) {
+        this.road_manager.setMoveSpeed(speed);
     },
 
     //废弃
@@ -245,27 +358,30 @@ cc.Class({
 
         //开启渲染
         this.gameStart = true;
-        //展示路面
-        // this.showRoad();
-        //人物开始游戏
-        this.character.run();
+
+        //人物跳到很高的地方
+        this.character.runNew();
+        //这个时候使地图移动速度变快
+        this.setBgSpeed(global.SHOWUP_SPEED);
+        this.setRoadSpeed(global.SHOWUP_SPEED);
+        //人物落地之后，切回正常速度
+
+
     },
     exitGame() {
         cc.log('退出')
         cc.game.end();
     },
 
-
+    //首页地图移动
+    homeBgMove(speed) {
+        this.background.x -= speed;
+    },
 
     //游戏地图移动相关
 
     //可能会动态获取这个地图，先开放一个方法
-    LoadMap() {
-        //用cc.loader动态的从服务器下载图片
-        //或者接入云开发，使用wx的接口从服务器拿图片也可以
 
-        //拿到之后,回调函数中设置当前游戏开始
-    },
     gamebgMove(speed, bgList) {
         for (let i of bgList) {
             i.x -= speed; //背景移动
@@ -273,9 +389,10 @@ cc.Class({
 
         }
     },
+
     fixBgPos(bg1, bg2, bg) {
-        cc.log(bg1, bg2, bg)
-        bg1.x = bg.getBoundingBox().xMax * 0.6 - 2000; //这个需要实验之后设置
+        cc.log(bg1, bg2, bg);
+        bg1.x = bg.getBoundingBox().xMax * 0.6 - 3200; //这个需要实验之后设置
         //第一张图，由于是接着home背景图直接衔接，由于图片有动画效果的缩放，但动作系统由于是并行，导致当时还没有修改home的包围盒，需要手动计算
         bg1.y = 0; //这个设置到0即可，0是相对于canvas中心的，canvas的锚点在他的中心
         cc.log('bg1', bg1.x, bg1.y);

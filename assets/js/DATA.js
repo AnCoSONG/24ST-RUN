@@ -3,6 +3,17 @@
 const global = {
     ROAD_HEIGHT: -150,
 
+    HEIGHT_HIT_PLAYER: -125,
+
+    RESTART: false,
+
+    PLAYER_SHOWUP: false,
+
+    NORMAL_ROAD_SPEED: 500,
+    NORMAL_BG_SPEED: 250,
+
+    SHOWUP_SPEED: 1000,
+
     GAME_STATUS: { //游戏状态枚举
 
         WAIT_FOR_START: 0,
