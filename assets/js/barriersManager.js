@@ -50,9 +50,7 @@ cc.Class({
 
     start() {
         // this.schedule(this.generateBarrier, 5, cc.macro.REPEAT_FOREVER, 10);
-        let interval = 3;
-        let delay = 10;
-        this.schedule(this.generateBarrier, interval, cc.macro.REPEAT_FOREVER, delay);
+
     },
 
     init(gm) {
@@ -252,5 +250,12 @@ cc.Class({
         //         this.generationStatus = WAIT;
         //     }
         // }
+        if (global.PLAYER_SHOWUP && !global.BARRIER_SCHEDULED) {
+
+            let interval = 3;
+            let delay = 5;
+            this.schedule(this.generateBarrier, interval, cc.macro.REPEAT_FOREVER, delay);
+            global.BARRIER_SCHEDULED = true;
+        }
     },
 });

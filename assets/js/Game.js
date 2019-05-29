@@ -48,6 +48,8 @@ cc.Class({
             default: null
         },
 
+        topBar: cc.Node,
+
         // mapPrefab: {
         //     type: cc.Prefab,
         //     default: null
@@ -302,7 +304,7 @@ cc.Class({
 
     showHomePage() {
         //展示状态栏
-
+        this.showTopBar();
         //展示按钮
         //借助它scheduleOnce展示人物
         this.showButton();
@@ -311,8 +313,24 @@ cc.Class({
 
     },
 
+    showTopBar() {
+        let topBarMoveIn = cc.moveBy(2, cc.v2(0, -170)).easing(cc.easeCubicActionInOut())
+        this.scheduleOnce(_ => {
+
+            this.topBar.runAction(topBarMoveIn)
+        }, 0.5)
+    },
+
+    hideTopBar() {
+        let topBarMoveOut = cc.moveBy(0.5, cc.v2(0, 170)).easing(cc.easeCubicActionInOut())
+        this.scheduleOnce(_ => {
+
+            this.topBar.runAction(topBarMoveOut)
+        }, 0)
+    },
+
     showButton() {
-        let buttonAction = cc.moveBy(2, cc.v2(-400, 0)).easing(cc.easeCubicActionInOut());
+        let buttonAction = cc.moveBy(2, cc.v2(-500, 0)).easing(cc.easeCubicActionInOut());
         //人物部分交给人物实现
         // let charAction = cc.moveBy(2, cc.v2(0, -680)).easing(cc.easeQuarticActionOut());
         this.scheduleOnce(() => {
@@ -321,11 +339,11 @@ cc.Class({
             // this.character.node.runAction(charAction);
             this.character.appear();
 
-        }, 1)
+        }, 0.5)
     },
 
     hideButton() {
-        let buttonAction = cc.moveBy(2, cc.v2(400, 0)).easing(cc.easeCubicActionInOut());
+        let buttonAction = cc.moveBy(0.5, cc.v2(500, 0)).easing(cc.easeCubicActionInOut());
         // let charAction = cc.sequence(cc.jumpBy(1.5, cc.v2(400, -250), 50, 1).easing(cc.easeCubicActionOut()), cc.moveBy(1, cc.v2(-400, 0)).easing(cc.easeQuadraticActionInOut()));
         this.scheduleOnce(() => {
             this.startButton.runAction(buttonAction);
@@ -354,6 +372,7 @@ cc.Class({
 
         //隐藏按钮
         this.hideButton();
+        this.hideTopBar();
         cc.log('开跑');
 
         //开启渲染

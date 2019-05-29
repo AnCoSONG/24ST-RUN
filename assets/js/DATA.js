@@ -9,6 +9,8 @@ const global = {
 
     PLAYER_SHOWUP: false,
 
+    BARRIER_SCHEDULED: false,
+
     NORMAL_ROAD_SPEED: 500,
     NORMAL_BG_SPEED: 250,
 

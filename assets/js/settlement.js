@@ -43,12 +43,15 @@ cc.Class({
     onBack() {
         global.RESTART = false;
         global.PLAYER_SHOWUP = false;
+        global.BARRIER_SCHEDULED = false;
         cc.director.loadScene('home')
     },
 
     onRestart() {
         global.RESTART = true;
         global.PLAYER_SHOWUP = false;
+        global.BARRIER_SCHEDULED = false;
+
         cc.director.loadScene('home')
     },
 

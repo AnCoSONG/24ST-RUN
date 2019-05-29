@@ -101,7 +101,7 @@ cc.Class({
     fixRoadPos(roadList) {
         //可以将x设置一些偏移
         cc.log(this.gameManager.viewportWidth)
-        roadList[0].setPosition(this.gameManager.viewportWidth / 2, global.ROAD_HEIGHT);
+        roadList[0].setPosition(this.gameManager.viewportWidth / 2 + 50, global.ROAD_HEIGHT);
         for (let i = 1; i < roadList.length; i++) {
             roadList[i].setPosition(roadList[i - 1].getBoundingBox().xMax, global.ROAD_HEIGHT);
         }
