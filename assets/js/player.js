@@ -59,6 +59,7 @@ cc.Class({
     init(gm) {
         this.gameManager = gm; //只要用this标明了那就是类变量，不用非在生命函数最开始的部分声明
         cc.log(this.name + 'initialization done!')
+        this.fixPos();
 
 
     },
@@ -67,12 +68,19 @@ cc.Class({
 
     },
 
+    //初始化人物位置
+    fixPos() {
+        this.node.x = -300;
+        this.node.y = -750;
+    },
+
     //人物出现
     appear() {
-        let jumpUp = cc.moveBy(0.5, cc.v2(100, 830)).easing(cc.easeSineOut());
-        let jumpDown = cc.moveBy(0.2, cc.v2(10, -50)).easing(cc.easeSineIn());
 
-        this.node.runAction(cc.sequence(jumpUp, jumpDown));
+        let jumpUp = cc.moveBy(0.5, cc.v2(130, 860)).easing(cc.easeSineOut());
+        let jumpDown = cc.moveBy(0.2, cc.v2(10, -60)).easing(cc.easeSineIn());
+
+        this.node.runAction(cc.sequence(cc.callFunc(_ => this.setDragonBonesAnimation('jump1')), jumpUp, jumpDown, cc.callFunc(_ => this.setDragonBonesAnimation('stand2'))));
     },
 
     //开跑
@@ -81,12 +89,12 @@ cc.Class({
     run() {
         cc.log('开始游戏')
         let jumpAnimation = cc.callFunc(_ => {
-            this.player.playAnimation('jump')
+            this.setDragonBonesAnimation('jump1')
         })
         let jumpDown = cc.moveBy(0.2, cc.v2(0, this.jumpHeight)).easing(cc.easeCubicActionOut());
         let jumpUp = cc.moveBy(0.5, cc.v2(0, -470)).easing(cc.easeCubicActionIn());
         let runAnimation = cc.callFunc(() => {
-            this.player.playAnimation('run')
+            this.setDragonBonesAnimation('run')
         });
 
         this.node.runAction(cc.sequence(jumpAnimation, jumpDown, jumpUp, runAnimation));
@@ -99,7 +107,7 @@ cc.Class({
         let superJump = cc.callFunc(_ => {
             //蓄力
             //起跳
-            this.setDragonBonesAnimation('jump');
+            this.setDragonBonesAnimation('jump1');
             this.vSpeed = 2000;
             this.vAccel = 2000;
             this.vMove = true;
@@ -136,11 +144,11 @@ cc.Class({
         //可能得重写，得手动用加速度和坐标去实现跳跃
 
         let jumpAnimation = cc.callFunc(_ => {
-            this.player.playAnimation('jump');
+            this.setDragonBonesAnimation('jump1')
         })
 
         let runAction = cc.callFunc(_ => {
-            this.player.playAnimation('run')
+            this.setDragonBonesAnimation('run')
         })
 
         let addTime = cc.callFunc(_ => {
@@ -195,7 +203,9 @@ cc.Class({
     jumpNew() {
         if (this.jumpTime == 2 || this.jumpTime == 1) {
             if (this.jumpTime == 2) {
-                this.setDragonBonesAnimation('jump')
+                this.setDragonBonesAnimation('jump1')
+            } else if (this.jumpTime == 1) {
+                this.setDragonBonesAnimation('jump2')
             }
 
             this.jumpTime--;
@@ -213,12 +223,37 @@ cc.Class({
         cc.log('game over')
 
         //播放人物死亡动画
-
-
+        this.gameManager.scoreManager.updateScore();
         //切换到gameover界面
         cc.director.loadScene('gameover');
     },
 
+    //type: 0. 问题打错扣血 1. 被石头击中15 2. 被飞镖集中20 3. 被地剑击中30 
+    damage(count, type) {
+
+        this.hp -= count;
+        cc.log('after hit', this.hp)
+        switch (type) {
+            case 0:
+                this.gameManager.statusShower.setStatus(1)
+                break;
+
+            case 1:
+                this.gameManager.statusShower.setStatus(2)
+
+                break;
+            case 2:
+                this.gameManager.statusShower.setStatus(3)
+
+                break;
+            case 3:
+                this.gameManager.statusShower.setStatus(4)
+
+                break;
+        }
+
+
+    },
 
 
 
@@ -234,7 +269,7 @@ cc.Class({
 
 
 
-        cc.log('人物高度', this.node.y)
+        // cc.log('人物高度', this.node.y)
         // cc.log(this.node.getBoundingBox())
 
         //水平移动
@@ -244,7 +279,7 @@ cc.Class({
 
         //跳跃逻辑
         // 判断是否进入跳跃状态
-        cc.log(this.vMove, this.vSpeed, this.vAccel);
+        // cc.log(this.vMove, this.vSpeed, this.vAccel);
         if (this.vMove) {
             this.node.y += this.vSpeed * dt; //改变y坐标
             this.vSpeed -= this.vAccel * dt; //改变纵向速度
@@ -257,16 +292,16 @@ cc.Class({
 
             if (this.gameManager.road_manager.getCurrentRoad().name == "road1") {
 
-                if (this.node.getBoundingBox().yMin < this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 10) {
-                    //检测地面碰撞情况
-                    cc.log('落地')
-                    this.node.y = this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 10;
-                }
-            } else if (this.gameManager.road_manager.getCurrentRoad().name == 'road2') {
                 if (this.node.getBoundingBox().yMin < this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 5) {
                     //检测地面碰撞情况
                     cc.log('落地')
                     this.node.y = this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 5;
+                }
+            } else if (this.gameManager.road_manager.getCurrentRoad().name == 'road2') {
+                if (this.node.getBoundingBox().yMin < this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 3) {
+                    //检测地面碰撞情况
+                    cc.log('落地')
+                    this.node.y = this.gameManager.road_manager.getCurrentRoad().getBoundingBox().yMax - 3;
                 }
             }
         }
@@ -300,7 +335,7 @@ cc.Class({
                 global.PLAYER_SHOWUP = true;
                 this.gameManager.road_manager.setMoveSpeed(global.NORMAL_ROAD_SPEED);
                 this.gameManager.setBgSpeed(global.NORMAL_BG_SPEED);
-
+                this.node.runAction(cc.moveBy(3, cc.v2(-150, 0)));
                 cc.log(this.gameManager.bgSpeed);
                 cc.log(this.gameManager.road_manager.moveSpeed);
             }
@@ -314,15 +349,18 @@ cc.Class({
 
         } else if (other.tag == 2) {
             //arrow
-            cc.log('arrow damage ', this.gameManager.barriersManager.arrow.data.getComponent('arrow').damage);
-            this.hp -= this.gameManager.barriersManager.arrow.data.getComponent('arrow').damage; //从prefab资源中直接拿到数据
+            let arrow_damage = this.gameManager.barriersManager.arrow.data.getComponent('arrow').damage; //从prefab资源中直接拿到数据
+            cc.log('arrow damage ', arrow_damage);
+            this.damage(arrow_damage, 2)
             if (this.hp <= 0) {
                 cc.log('You are dead');
                 //Game Over 效果
                 this.node.emit('player_dead');
             }
         } else if (other.tag == 3) {
-            cc.log('stone damage', this.gameManager.barriersManager.arrow.data.getComponent('arrow').damage)
+            let stone_damage = this.gameManager.barriersManager.arrow.data.getComponent('arrow').damage
+            cc.log('stone damage', stone_damage)
+            this.damage(stone_damage, 1)
             this.hp -= this.gameManager.barriersManager.stone.data.getComponent('stone').damage;
             if (this.hp <= 0) {
                 cc.log('You are dead');

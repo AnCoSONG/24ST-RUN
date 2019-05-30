@@ -28,12 +28,15 @@ cc.Class({
         //     set (value) {
         //         this._bar = value;
         //     }
+        points: cc.Label
         // },
     },
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {},
+    onLoad() {
+        this.points.string = global.CURRENT_SCORE;
+    },
 
     start() {
 
@@ -44,6 +47,8 @@ cc.Class({
         global.RESTART = false;
         global.PLAYER_SHOWUP = false;
         global.BARRIER_SCHEDULED = false;
+
+        global.ASKED_QUESTION = []; //已问过的清空
         cc.director.loadScene('home')
     },
 
@@ -51,6 +56,9 @@ cc.Class({
         global.RESTART = true;
         global.PLAYER_SHOWUP = false;
         global.BARRIER_SCHEDULED = false;
+
+        global.ASKED_QUESTION = []; //已问过的清空
+
 
         cc.director.loadScene('home')
     },

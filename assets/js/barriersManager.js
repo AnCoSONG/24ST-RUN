@@ -34,7 +34,8 @@ cc.Class({
         // },
         arrow: cc.Prefab,
         stone: cc.Prefab,
-        sword: cc.Prefab
+        sword: cc.Prefab,
+        question: cc.Prefab,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -45,6 +46,26 @@ cc.Class({
         this.swordList = []; //刀剑库，生成一系列刀剑
 
         this.generationStatus = WAIT;
+
+        this.node.on('question-answered', function (res) {
+            cc.log(res)
+            this.node.getChildByName('questionManager').removeFromParent();
+            this.generationStatus = DONE;
+            global.QUESTION_BARRIER = false;
+            cc.log('当前生成状态', this.generationStatus)
+        }, this)
+
+
+        // this.node.on('questionComingTipFinish', function (question, answer, options) {
+        //     // 显示主框
+
+
+
+        // })
+
+        // this.node.on('mainbarFinish', function () {
+        //     //minibar显示以及问题显示
+        // })
 
     },
 
@@ -179,6 +200,83 @@ cc.Class({
         //待补充
     },
 
+    generateQuestionBarrier() {
+        /*生成问题关卡流程
+         1.提示问题来了
+         2.提示消失
+         3.2s后问题在卷轴上出现
+         4.展示5s
+         5.问题卷轴消失
+         6.之后问题bar显示
+         7.答案道具出现，答案是一个按钮，点击就会触发回答事件，这个按钮被点击后会调用上层问答监听器的验证答案回调，答案验证会在这执行
+         8.答案正确，则会加分，加分的实现依靠gameManager的积分系统引用，答案不对则会掉血，这个依靠player引用
+        */
+        this.generationStatus = GENERATING;
+        global.QUESTION_BARRIER = true;
+        let questionNode = cc.instantiate(this.question)
+        cc.log('instantiate', questionNode.x, questionNode.y)
+        questionNode.getComponent('questionManager').init(this.gameManager);
+        cc.log('after init', questionNode.x, questionNode.y)
+        questionNode.getComponent('questionManager').loadQuestion(); //通过question内部事件实现一步一步的操作
+        this.node.addChild(questionNode);
+
+        // questionNode.getComponent('questionManager').showAndHideTip();
+        // questionNode.getComponent('questionManager').showAndHideMainBar();
+        // questionNode.getComponent('questionManager').showMiniBar();
+        // questionNode.getComponent('questionManager').showOption();
+
+
+        // this.scheduleOnce(_ => {
+        //     questionNode.getComponent('questionManager').hideMiniBar();
+        //     questionNode.getComponent('questionManager').hideOption();
+
+
+        // }, 20)
+
+        // this.scheduleOnce(_ => {
+        //     questionNode.removeFromParent();
+        //     this.generationStatus = DONE;
+        //     global.QUESTION_BARRIER = false;
+        // }, 5)
+        //这个实现有很多问题，我觉得有过度封装的问题，导致逻辑混乱，太过耦合
+        //因此我准备直接将节点设置在位置上的做法
+
+        //随机数生成去选择要load哪个问题
+        //cc.log('生成问题')
+        // let self = this;
+        // this.generationStatus = GENERATING;
+        // cc.loader.loadRes('solarsystemquz', function (error, res) {
+        //     if (error) {
+        //         cc.log(error)
+        //     }
+        //     cc.log('res', res)
+        //     let question = res.json.question
+        //     let ans = res.json.answer;
+        //     let options = res.json.options
+
+        //     global.CURRENT_QUESTION_LABEL = question;
+        //     global.CURRENT_QUESTION_ANSWER = ans;
+        //     global.ASKED_QUESTION.push(question);
+
+        //     cc.log('load res and question coming')
+        //     self.questionComingTip.opacity = 0;
+        //     self.questionComingTip.setPosition(0, 100)
+        //     let finishTip = cc.callFunc(_ => {
+        //         self.setPosition(-1000, -1000); //移动到外面
+
+        //         this.node.emit('questionComingTipFinish');
+        //     })
+        //     self.questionComingTip.runAction(cc.sequence(cc.fadeIn(1), cc.repeat(cc.sequence(cc.moveBy(0.5, cc.v2(0, 0)), cc.moveBy(0.5, cc.v2(0, 0))), 2), cc.fadeOut(1), finishTip))
+
+
+        // })
+
+    },
+
+    generateCountryBarrier() {
+
+    },
+
     generateBarrier() {
         if (this.gameManager.gameStart) {
             cc.log('game start')
@@ -186,8 +284,9 @@ cc.Class({
             if (this.generationStatus == WAIT) {
                 cc.log('wait for barrier');
                 //随机数看生成什么关卡
-                let rand = Math.floor(Math.random() * 2)
-                // rand = 0;
+                let rand = Math.floor(Math.random() * 4)
+                // rand = 3;
+                cc.log('当前关卡', rand)
                 switch (rand) {
                     case 0:
                         cc.log('arrow 关')
@@ -201,6 +300,21 @@ cc.Class({
                         cc.log('sword 关')
                         this.generateSwordBarrier();
                         break;
+                    case 3:
+                        cc.log('节气问题 关');
+                        this.generateQuestionBarrier()
+                        break;
+                    case 4:
+                        cc.log('党的问题 关')
+                        this.generateCountryBarrier()
+                        break;
+                    case 5:
+                        cc.log('金币关')
+                        break;
+                    case 6:
+                        cc.log('金币关')
+                        break;
+
                 }
 
             } else if (this.generationStatus == DONE) {

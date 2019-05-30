@@ -1,20 +1,30 @@
 //数据存储
 
 const global = {
-    ROAD_HEIGHT: -150,
+    ROAD_HEIGHT: -100,
 
-    HEIGHT_HIT_PLAYER: -125,
+    HEIGHT_HIT_PLAYER: -75,
 
     RESTART: false,
 
-    PLAYER_SHOWUP: false,
+    PLAYER_SHOWUP: false, // 人物落地后为true
 
-    BARRIER_SCHEDULED: false,
+    BARRIER_SCHEDULED: false, //关卡schedule后为true
+
+    QUESTION_BARRIER: false,
+
+    CURRENT_QUESTION_LABEL: '哪个节气白天最长晚上最短?',
+
+    CURRENT_QUESTION_ANSWER: '夏至',
+
+    ASKED_QUESTION: [],
 
     NORMAL_ROAD_SPEED: 500,
     NORMAL_BG_SPEED: 250,
 
     SHOWUP_SPEED: 1000,
+
+    CURRENT_SCORE: 0,
 
     GAME_STATUS: { //游戏状态枚举
 

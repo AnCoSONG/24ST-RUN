@@ -12,6 +12,8 @@ import player from 'player';
 import barriersManager from 'barriersManager'
 import road_manager from 'road'
 import global from './DATA';
+import scoreManager from './scoreManager'
+import statusShower from './statusShower'
 
 
 cc.Class({
@@ -72,7 +74,17 @@ cc.Class({
 
         barriersManager: barriersManager,
 
-        road_manager: road_manager
+        road_manager: road_manager,
+
+        gamingTopBar: cc.Node,
+
+        gamingOperatingBar: cc.Node,
+
+        // questionBar: cc.Node
+        info: cc.Prefab,
+        scoreManager: scoreManager,
+
+        statusShower: statusShower
 
     },
 
@@ -148,7 +160,7 @@ cc.Class({
 
             let showLogo = cc.fadeIn(1)
 
-            let scaleLogo = cc.scaleTo(1, 1.1).easing(cc.easeCubicActionInOut())
+            let scaleLogo = cc.scaleTo(2, 1.2).easing(cc.easeCubicActionInOut())
             let hideLogo = cc.spawn(cc.moveBy(0.5, cc.v2(0, 100)), cc.fadeOut(0.5));
             let logoFinish = cc.callFunc(_ => {
                 this.node.emit('logofinish')
@@ -161,6 +173,8 @@ cc.Class({
             // cc.log(this.background.getNumberOfRunningActions());
             this.background.resumeAllActions();
         }, this)
+
+
 
 
 
@@ -185,9 +199,9 @@ cc.Class({
         if (event.getLocationX() < this.viewportWidth / 2) {
             //左半屏触摸
             cc.log('left')
-            if (this.gameStart) {
-                this.character.jumpNew();
-            }
+            // if (this.gameStart) {
+            //     this.character.jumpNew();
+            // }
 
         } else {
             // 右半屏触摸
@@ -195,11 +209,11 @@ cc.Class({
         }
 
         //判断是否点进了某个刚体组件
-        if (cc.Intersection.pointInPolygon(event.getLocation(), this.character.getComponent(cc.BoxCollider).world.points)) {
-            cc.log('point in character')
-        } else {
-            cc.log('nothing')
-        }
+        // if (cc.Intersection.pointInPolygon(event.getLocation(), this.character.getComponent(cc.BoxCollider).world.points)) {
+        //     cc.log('point in character')
+        // } else {
+        //     cc.log('nothing')
+        // }
     },
 
     onTouchEnd(event) {
@@ -223,7 +237,18 @@ cc.Class({
 
         this.barriersManager.init(this);
 
+        //游戏状态栏init
+        this.gamingOperatingBar.getComponent('gamingOperation').init(this);
+
+        this.gamingTopBar.getComponent('gamingTopBar').init(this);
+        //问题框初始化
+        // this.questionBar.getComponent('questionBar')
+
+        //得分系统初始化
+        this.scoreManager.init(this);
+
         //状态系统init
+        this.statusShower.init(this);
     },
 
     restart() {
@@ -236,9 +261,13 @@ cc.Class({
         //       this.vMove = true;
         //   })
         let startgame = cc.callFunc(_ => {
-            cc.log('restart game')
-            this.gameStart = true;
+            cc.log('restart game');
+            //显示游戏内bar
 
+
+            this.showGamingBar();
+            this.gameStart = true;
+            this.character.appear();
             //人物跳到很高的地方
             this.character.runNew();
             //这个时候使地图移动速度变快
@@ -314,7 +343,7 @@ cc.Class({
     },
 
     showTopBar() {
-        let topBarMoveIn = cc.moveBy(2, cc.v2(0, -170)).easing(cc.easeCubicActionInOut())
+        let topBarMoveIn = cc.moveBy(2, cc.v2(0, -160)).easing(cc.easeCubicActionInOut())
         this.scheduleOnce(_ => {
 
             this.topBar.runAction(topBarMoveIn)
@@ -368,11 +397,21 @@ cc.Class({
     //     this.road.runAction(roadAppearAction);
     // },
 
+    showGamingBar() {
+        this.scheduleOnce(_ => {
+            this.gamingTopBar.getComponent('gamingTopBar').showMe();
+            this.gamingOperatingBar.getComponent('gamingOperation').showMe();
+        }, 1)
+    },
+
     startGame() {
 
-        //隐藏按钮
+        //隐藏按钮和bar
         this.hideButton();
         this.hideTopBar();
+
+        //显示游戏内bar
+        this.showGamingBar();
         cc.log('开跑');
 
         //开启渲染
@@ -392,6 +431,32 @@ cc.Class({
         cc.game.end();
     },
 
+    onSet() {
+
+        let infoBar = cc.instantiate(this.info)
+        infoBar.setPosition(0, 0);
+        this.node.addChild(infoBar);
+    },
+
+    onPause() {
+        let pausePanel = this.node.getChildByName('pausePanel')
+        pausePanel.setPosition(0, 0)
+        pausePanel.active = true;
+        // // pausePanel.runAction(cc.fadeIn(1));
+        // pausePanel.runAction(appear)
+        cc.director.pause();
+
+    },
+
+    onResume() {
+        let pause = this.node.getChildByName('pausePanel')
+        pause.active = false;
+        pause.setPosition(2000, 2000);
+        // let disappear = cc.sequence(cc.fadeOut(1), cc.callFunc(_ => pause.setPosition(1000, 1000)))
+        // pause.runAction(disappear);
+        cc.director.resume();
+
+    },
     //首页地图移动
     homeBgMove(speed) {
         this.background.x -= speed;
@@ -433,6 +498,15 @@ cc.Class({
 
             //之后，这个队列跟着gamebgMove函数开始继续移动，由此就可以实现背景循环
 
+        }
+    },
+
+
+    //微信登录
+
+    wxLogin() {
+        if (cc.sys.platform == cc.sys.WECHAT_GAME) {
+            cc.log('is Wechat platform')
         }
     }
 
